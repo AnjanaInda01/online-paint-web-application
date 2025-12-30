@@ -5,7 +5,6 @@ import {
   Typography,
   Stack,
   Paper,
-  IconButton,
 } from "@mui/material";
 import BrushIcon from "@mui/icons-material/Brush";
 import "./App.css";
@@ -52,13 +51,12 @@ function App() {
     setIsDrawing(false);
   };
 
+
   return (
     <Box className="app">
-      <Typography variant="h3" className="title">
+      <h1 variant="h3" className="title">
         Paint App
-      </Typography>
-
-      {/* Toolbar */}
+      </h1>
       <Paper elevation={3} className="toolbar">
         <Stack direction="row" spacing={4} alignItems="center">
           <Stack direction="row" spacing={1} alignItems="center">
@@ -94,7 +92,6 @@ function App() {
         </Stack>
       </Paper>
 
-      {/* Canvas */}
       <canvas
         ref={canvasRef}
         className="canvas"
