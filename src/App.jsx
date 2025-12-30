@@ -1,35 +1,110 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useRef, useState, useEffect } from "react";
+import {
+  Box,
+  Slider,
+  Typography,
+  Stack,
+  Paper,
+  IconButton,
+} from "@mui/material";
+import BrushIcon from "@mui/icons-material/Brush";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const canvasRef = useRef(null);
+  const ctxRef = useRef(null);
+
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [color, setColor] = useState("#8b6f61");
+  const [width, setWidth] = useState(12);
+  const [opacity, setOpacity] = useState(1);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    canvas.width = window.innerWidth - 60;
+    canvas.height = 450;
+
+    const ctx = canvas.getContext("2d");
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctxRef.current = ctx;
+  }, []);
+
+  const startDrawing = (e) => {
+    ctxRef.current.beginPath();
+    ctxRef.current.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    setIsDrawing(true);
+  };
+
+  const draw = (e) => {
+    if (!isDrawing) return;
+
+    ctxRef.current.strokeStyle = color;
+    ctxRef.current.lineWidth = width;
+    ctxRef.current.globalAlpha = opacity;
+
+    ctxRef.current.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    ctxRef.current.stroke();
+  };
+
+  const stopDrawing = () => {
+    ctxRef.current.closePath();
+    setIsDrawing(false);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Box className="app">
+      <Typography variant="h3" className="title">
+        Paint App
+      </Typography>
+
+      {/* Toolbar */}
+      <Paper elevation={3} className="toolbar">
+        <Stack direction="row" spacing={4} alignItems="center">
+          <Stack direction="row" spacing={1} alignItems="center">
+            <BrushIcon />
+            <Typography>Brush Color</Typography>
+            <input
+              type="color"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+            />
+          </Stack>
+
+          <Box width={200}>
+            <Typography>Brush Width</Typography>
+            <Slider
+              value={width}
+              min={1}
+              max={50}
+              onChange={(e, v) => setWidth(v)}
+            />
+          </Box>
+
+          <Box width={200}>
+            <Typography>Brush Opacity</Typography>
+            <Slider
+              value={opacity}
+              min={0.1}
+              max={1}
+              step={0.1}
+              onChange={(e, v) => setOpacity(v)}
+            />
+          </Box>
+        </Stack>
+      </Paper>
+
+      {/* Canvas */}
+      <canvas
+        ref={canvasRef}
+        className="canvas"
+        onMouseDown={startDrawing}
+        onMouseMove={draw}
+        onMouseUp={stopDrawing}
+        onMouseLeave={stopDrawing}
+      />
+    </Box>
+  );
 }
 
-export default App
+export default App;
